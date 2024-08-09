@@ -115,8 +115,13 @@ class SeleniumMiddleware:
                 request.wait_until
             )
 
-        if request.screenshot:
+        if isinstance(request.screenshot, bool) and request.screenshot:
             request.meta['screenshot'] = self.driver.get_screenshot_as_png()
+        elif isinstance(request.screenshot, str):
+            screenshot_data = self.driver.get_screenshot_as_png()
+            with open(request.screenshot, 'wb') as f:
+                f.write(screenshot_data)
+            request.meta['screenshot'] = request.screenshot
 
         if request.script:
             self.driver.execute_script(request.script)

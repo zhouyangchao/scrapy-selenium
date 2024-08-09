@@ -92,6 +92,18 @@ def parse_result(self, response):
         image_file.write(response.meta['screenshot'])
 ```
 
+New way to screenshot:
+```python
+yield SeleniumRequest(
+    url=url,
+    callback=self.parse_result,
+    screenshot=f'image.png'
+)
+
+def parse_result(self, response):
+    pass
+```
+
 #### `script`
 When used, selenium will execute custom JavaScript code.
 ```python
