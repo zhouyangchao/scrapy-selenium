@@ -31,10 +31,10 @@ In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` in
     SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
     ```
 
-2. Add the `Selenium4Middleware` to the downloader middlewares:
+2. Add the `SeleniumMiddleware` to the downloader middlewares:
     ```python
     DOWNLOADER_MIDDLEWARES = {
-        'scrapy_selenium.Selenium4Middleware': 800
+        'scrapy_selenium.SeleniumMiddleware': 800
     }
     ```
 ## Usage
