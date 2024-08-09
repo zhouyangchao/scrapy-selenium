@@ -15,9 +15,18 @@ You will also need one of the Selenium [compatible browsers](http://www.selenium
     ```python
     from shutil import which
 
-    SELENIUM_DRIVER_NAME = 'firefox'
-    SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
-    SELENIUM_DRIVER_ARGUMENTS=['--headless']  # '--headless' if using chrome instead of firefox, recommand --headless=new for >= Chrome 112
+    SELENIUM_DRIVER_NAME = 'chrome'
+    SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+    # The Best arguments for chrome headless
+    SELENIUM_DRIVER_ARGUMENTS=[
+        '--headless=new',
+        '--no-sandbox',
+        '--disable-gpu',
+        '--window-size=1280,1696',
+        '--disable-blink-features',
+        '--disable-blink-features=AutomationControlled',
+        '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
+    ]
     ```
 
 Optionally, set the path to the browser executable:
