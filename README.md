@@ -1,7 +1,7 @@
-# Scrapy with selenium
-[![PyPI](https://img.shields.io/pypi/v/scrapy-selenium.svg)](https://pypi.python.org/pypi/scrapy-selenium4) [![Build Status](https://travis-ci.org/clemfromspace/scrapy-selenium.svg?branch=master)](https://travis-ci.org/clemfromspace/scrapy-selenium) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/maintainability)
+# Scrapy with selenium4
+[![PyPI](https://img.shields.io/pypi/v/scrapy-selenium4.svg)](https://pypi.python.org/pypi/scrapy-selenium4)
 
-Scrapy middleware to handle javascript pages using selenium.
+Scrapy middleware to handle javascript pages using selenium >= 4.0.0.
 
 ## Installation
 ```
@@ -11,41 +11,35 @@ You should use **python>=3.6**.
 You will also need one of the Selenium [compatible browsers](http://www.seleniumhq.org/about/platforms.jsp).
 
 ## Configuration
-1. Add the browser to use, the path to the driver executable, and the arguments to pass to the executable to the scrapy settings:
-    ```python
-    from shutil import which
+Add the browser to use, the path to the driver executable, and the arguments to pass to the executable to the scrapy settings.py:
+```python
+from shutil import which
 
-    SELENIUM_DRIVER_NAME = 'chrome'
-    SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
-    # The Best arguments for chrome headless
-    SELENIUM_DRIVER_ARGUMENTS=[
-        '--headless=new',
-        '--no-sandbox',
-        '--disable-gpu',
-        '--window-size=1280,1696',
-        '--disable-blink-features',
-        '--disable-blink-features=AutomationControlled',
-        '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
-    ]
-    ```
+SELENIUM_DRIVER_NAME = 'chrome'
+SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
+# The Best arguments for chrome headless
+SELENIUM_DRIVER_ARGUMENTS=[
+    '--headless=new',
+    '--no-sandbox',
+    '--disable-gpu',
+    '--window-size=1280,1696',
+    '--disable-blink-features',
+    '--disable-blink-features=AutomationControlled',
+    '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
+]
 
-Optionally, set the path to the browser executable:
-    ```python
-    SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
-    ```
+# Optionally, set the path to the browser executable
+# SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
 
-In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` instead of `SELENIUM_DRIVER_EXECUTABLE_PATH`.
-`SELENIUM_DRIVER_EXECUTABLE_PATH` must be commented to use `SELENIUM_COMMAND_EXECUTOR`:
-    ```python
-    SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
-    ```
+# In order to use a remote Selenium driver, specify SELENIUM_COMMAND_EXECUTOR instead of SELENIUM_DRIVER_EXECUTABLE_PATH.
+# `SELENIUM_DRIVER_EXECUTABLE_PATH` must be commented.
+SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
 
-2. Add the `SeleniumMiddleware` to the downloader middlewares:
-    ```python
-    DOWNLOADER_MIDDLEWARES = {
-        'scrapy_selenium4.SeleniumMiddleware': 800
-    }
-    ```
+# Add the `SeleniumMiddleware` to the downloader middlewares
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_selenium4.SeleniumMiddleware': 800
+}
+```
 ## Usage
 Use the `scrapy_selenium4.SeleniumRequest` instead of the scrapy built-in `Request` like below:
 ```python
