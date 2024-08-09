@@ -1,4 +1,4 @@
-"""This module contains the base test cases for the ``scrapy_selenium`` package"""
+"""This module contains the base test cases for the ``scrapy_selenium4`` package"""
 
 from shutil import which
 from unittest import TestCase

@@ -43,13 +43,13 @@ In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` in
 2. Add the `SeleniumMiddleware` to the downloader middlewares:
     ```python
     DOWNLOADER_MIDDLEWARES = {
-        'scrapy_selenium.SeleniumMiddleware': 800
+        'scrapy_selenium4.SeleniumMiddleware': 800
     }
     ```
 ## Usage
-Use the `scrapy_selenium.SeleniumRequest` instead of the scrapy built-in `Request` like below:
+Use the `scrapy_selenium4.SeleniumRequest` instead of the scrapy built-in `Request` like below:
 ```python
-from scrapy_selenium import SeleniumRequest
+from scrapy_selenium4 import SeleniumRequest
 
 yield SeleniumRequest(url=url, callback=self.parse_result)
 ```
@@ -67,7 +67,7 @@ def parse_result(self, response):
 ```
 
 ### Additional arguments
-The `scrapy_selenium.SeleniumRequest` accept 4 additional arguments:
+The `scrapy_selenium4.SeleniumRequest` accept 4 additional arguments:
 
 #### `wait_time` / `wait_until`
 

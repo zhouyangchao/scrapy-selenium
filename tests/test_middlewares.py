@@ -1,12 +1,12 @@
-"""This module contains the test cases for the middlewares of the ``scrapy_selenium`` package"""
+"""This module contains the test cases for the middlewares of the ``scrapy_selenium4`` package"""
 
 from unittest.mock import patch
 
 from scrapy import Request
 from scrapy.crawler import Crawler
 
-from scrapy_selenium.http import SeleniumRequest
-from scrapy_selenium.middlewares import SeleniumMiddleware
+from scrapy_selenium4.http import SeleniumRequest
+from scrapy_selenium4.middlewares import SeleniumMiddleware
 
 from .test_cases import BaseScrapySeleniumTestCase
 
@@ -123,7 +123,7 @@ class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
 
         selenium_request = SeleniumRequest(
             url='http://www.python.org',
-            script='document.title = "scrapy_selenium";'
+            script='document.title = "scrapy_selenium4";'
         )
 
         html_response = self.selenium_middleware.process_request(
@@ -133,5 +133,5 @@ class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
 
         self.assertEqual(
             html_response.selector.xpath('//title/text()').extract_first(),
-            'scrapy_selenium'
+            'scrapy_selenium4'
         )
