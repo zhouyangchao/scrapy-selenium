@@ -1,4 +1,4 @@
-"""This module contains the ``SeleniumMiddleware`` scrapy middleware"""
+"""This module contains the ``Selenium4Middleware`` scrapy middleware"""
 
 from importlib import import_module
 
@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from .http import SeleniumRequest
 
 
-class SeleniumMiddleware:
+class Selenium4Middleware:
     """Scrapy middleware handling the requests using selenium"""
 
     def __init__(self, driver_name, driver_executable_path,

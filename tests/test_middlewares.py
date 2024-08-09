@@ -6,13 +6,13 @@ from scrapy import Request
 from scrapy.crawler import Crawler
 
 from scrapy_selenium.http import SeleniumRequest
-from scrapy_selenium.middlewares import SeleniumMiddleware
+from scrapy_selenium.middlewares import Selenium4Middleware
 
 from .test_cases import BaseScrapySeleniumTestCase
 
 
-class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
-    """Test case for the ``SeleniumMiddleware`` middleware"""
+class Selenium4MiddlewareTestCase(BaseScrapySeleniumTestCase):
+    """Test case for the ``Selenium4Middleware`` middleware"""
 
     @classmethod
     def setUpClass(cls):
@@ -25,7 +25,7 @@ class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
             settings=cls.settings
         )
 
-        cls.selenium_middleware = SeleniumMiddleware.from_crawler(crawler)
+        cls.selenium_middleware = Selenium4Middleware.from_crawler(crawler)
 
     @classmethod
     def tearDownClass(cls):
@@ -43,7 +43,7 @@ class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
             settings=self.settings
         )
 
-        selenium_middleware = SeleniumMiddleware.from_crawler(crawler)
+        selenium_middleware = Selenium4Middleware.from_crawler(crawler)
 
         # The driver must be initialized
         self.assertIsNotNone(selenium_middleware.driver)
@@ -62,7 +62,7 @@ class SeleniumMiddlewareTestCase(BaseScrapySeleniumTestCase):
             settings=self.settings
         )
 
-        selenium_middleware = SeleniumMiddleware.from_crawler(crawler)
+        selenium_middleware = Selenium4Middleware.from_crawler(crawler)
 
         with patch.object(selenium_middleware.driver, 'quit') as mocked_quit:
             selenium_middleware.spider_closed()

@@ -1,11 +1,11 @@
 # Scrapy with selenium
-[![PyPI](https://img.shields.io/pypi/v/scrapy-selenium.svg)](https://pypi.python.org/pypi/scrapy-selenium) [![Build Status](https://travis-ci.org/clemfromspace/scrapy-selenium.svg?branch=master)](https://travis-ci.org/clemfromspace/scrapy-selenium) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/maintainability)
+[![PyPI](https://img.shields.io/pypi/v/scrapy-selenium.svg)](https://pypi.python.org/pypi/scrapy-selenium4) [![Build Status](https://travis-ci.org/clemfromspace/scrapy-selenium.svg?branch=master)](https://travis-ci.org/clemfromspace/scrapy-selenium) [![Test Coverage](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/test_coverage)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/test_coverage) [![Maintainability](https://api.codeclimate.com/v1/badges/5c737098dc38a835ff96/maintainability)](https://codeclimate.com/github/clemfromspace/scrapy-selenium/maintainability)
 
 Scrapy middleware to handle javascript pages using selenium.
 
 ## Installation
 ```
-$ pip install scrapy-selenium
+$ pip install scrapy-selenium4
 ```
 You should use **python>=3.6**. 
 You will also need one of the Selenium [compatible browsers](http://www.seleniumhq.org/about/platforms.jsp).
@@ -17,7 +17,7 @@ You will also need one of the Selenium [compatible browsers](http://www.selenium
 
     SELENIUM_DRIVER_NAME = 'firefox'
     SELENIUM_DRIVER_EXECUTABLE_PATH = which('geckodriver')
-    SELENIUM_DRIVER_ARGUMENTS=['-headless']  # '--headless' if using chrome instead of firefox
+    SELENIUM_DRIVER_ARGUMENTS=['--headless']  # '--headless' if using chrome instead of firefox, recommand --headless=new for >= Chrome 112
     ```
 
 Optionally, set the path to the browser executable:
@@ -25,15 +25,16 @@ Optionally, set the path to the browser executable:
     SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
     ```
 
-In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` instead of `SELENIUM_DRIVER_EXECUTABLE_PATH`:
+In order to use a remote Selenium driver, specify `SELENIUM_COMMAND_EXECUTOR` instead of `SELENIUM_DRIVER_EXECUTABLE_PATH`.
+`SELENIUM_DRIVER_EXECUTABLE_PATH` must be commented to use `SELENIUM_COMMAND_EXECUTOR`:
     ```python
     SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
     ```
 
-2. Add the `SeleniumMiddleware` to the downloader middlewares:
+2. Add the `Selenium4Middleware` to the downloader middlewares:
     ```python
     DOWNLOADER_MIDDLEWARES = {
-        'scrapy_selenium.SeleniumMiddleware': 800
+        'scrapy_selenium.Selenium4Middleware': 800
     }
     ```
 ## Usage

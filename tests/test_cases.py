@@ -7,7 +7,7 @@ import scrapy
 
 
 class BaseScrapySeleniumTestCase(TestCase):
-    """Base test case for the ``scrapy-selenium`` package"""
+    """Base test case for the ``scrapy-selenium4`` package"""
 
     class SimpleSpider(scrapy.Spider):
         name = 'simple_spider'
@@ -24,6 +24,6 @@ class BaseScrapySeleniumTestCase(TestCase):
         cls.settings = {
             'SELENIUM_DRIVER_NAME': 'firefox',
             'SELENIUM_DRIVER_EXECUTABLE_PATH': which('geckodriver'),
-            'SELENIUM_DRIVER_ARGUMENTS': ['-headless']
+            'SELENIUM_DRIVER_ARGUMENTS': ['--headless']
         }
         cls.spider_klass = cls.SimpleSpider

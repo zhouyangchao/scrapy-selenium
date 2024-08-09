@@ -1,2 +1,2 @@
 from .http import SeleniumRequest
-from .middlewares import SeleniumMiddleware
+from .middlewares import Selenium4Middleware
