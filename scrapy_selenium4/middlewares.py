@@ -1,11 +1,14 @@
 """This module contains the ``SeleniumMiddleware`` scrapy middleware"""
 
 from importlib import import_module
+import logging
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
 from scrapy.http import HtmlResponse
+from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 from .http import SeleniumRequest
 
@@ -61,7 +64,6 @@ class SeleniumMiddleware:
             self.driver = driver_klass(**driver_kwargs)
         # remote driver
         elif command_executor is not None:
-            from selenium import webdriver
             self.driver = webdriver.Remote(command_executor=command_executor,
                                            options=driver_options)
 
@@ -111,9 +113,12 @@ class SeleniumMiddleware:
             )
 
         if request.wait_until:
-            WebDriverWait(self.driver, request.wait_time).until(
-                request.wait_until
-            )
+            try:
+                WebDriverWait(self.driver, request.wait_time).until(
+                    request.wait_until
+                )
+            except TimeoutException:
+                pass
 
         if isinstance(request.screenshot, bool) and request.screenshot:
             request.meta['screenshot'] = self.driver.get_screenshot_as_png()
@@ -124,7 +129,10 @@ class SeleniumMiddleware:
             request.meta['screenshot'] = request.screenshot
 
         if request.script:
-            self.driver.execute_script(request.script)
+            try:
+                self.driver.execute_script(request.script)
+            except Exception as e:
+                logging.error(f"JavaScript execution error: {e}")
 
         body = str.encode(self.driver.page_source)
 
