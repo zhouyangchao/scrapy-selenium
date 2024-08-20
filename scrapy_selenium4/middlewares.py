@@ -2,6 +2,7 @@
 
 from importlib import import_module
 import logging
+from shutil import which
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
@@ -71,11 +72,19 @@ class SeleniumMiddleware:
     def from_crawler(cls, crawler):
         """Initialize the middleware with the crawler settings"""
 
-        driver_name = crawler.settings.get('SELENIUM_DRIVER_NAME')
-        driver_executable_path = crawler.settings.get('SELENIUM_DRIVER_EXECUTABLE_PATH')
+        driver_name = crawler.settings.get('SELENIUM_DRIVER_NAME', 'chrome')
+        driver_executable_path = crawler.settings.get('SELENIUM_DRIVER_EXECUTABLE_PATH', which('chromedriver'))
         browser_executable_path = crawler.settings.get('SELENIUM_BROWSER_EXECUTABLE_PATH')
         command_executor = crawler.settings.get('SELENIUM_COMMAND_EXECUTOR')
-        driver_arguments = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS')
+        driver_arguments = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS', [
+            '--headless=new',  # '--disable-gpu',
+            '--no-sandbox',
+            '--disable-gpu',
+            '--window-size=1280,1696',
+            '--disable-blink-features',
+            '--disable-blink-features=AutomationControlled',
+            '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
+        ])
 
         if driver_name is None:
             raise NotConfigured('SELENIUM_DRIVER_NAME must be set')

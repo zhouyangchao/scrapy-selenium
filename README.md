@@ -13,11 +13,16 @@ You will also need one of the Selenium [compatible browsers](http://www.selenium
 ## Configuration
 Add the browser to use, the path to the driver executable, and the arguments to pass to the executable to the scrapy settings.py:
 ```python
-from shutil import which
-
+# Add the `SeleniumMiddleware` to the downloader middlewares
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy_selenium4.SeleniumMiddleware': 800
+}
+```
+Other configurations(Default):
+```python
 SELENIUM_DRIVER_NAME = 'chrome'
+from shutil import which
 SELENIUM_DRIVER_EXECUTABLE_PATH = which('chromedriver')
-# The Best arguments for chrome headless
 SELENIUM_DRIVER_ARGUMENTS=[
     '--headless=new',
     '--no-sandbox',
@@ -27,30 +32,23 @@ SELENIUM_DRIVER_ARGUMENTS=[
     '--disable-blink-features=AutomationControlled',
     '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
 ]
-
-# Optionally, set the path to the browser executable
-# SELENIUM_BROWSER_EXECUTABLE_PATH = which('firefox')
-
 # In order to use a remote Selenium driver, specify SELENIUM_COMMAND_EXECUTOR instead of SELENIUM_DRIVER_EXECUTABLE_PATH.
 # `SELENIUM_DRIVER_EXECUTABLE_PATH` must be commented.
 SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
-
-# Add the `SeleniumMiddleware` to the downloader middlewares
-DOWNLOADER_MIDDLEWARES = {
-    'scrapy_selenium4.SeleniumMiddleware': 800
-}
 ```
 ## Usage
 Use the `scrapy_selenium4.SeleniumRequest` instead of the scrapy built-in `Request` like below:
 ```python
 from scrapy_selenium4 import SeleniumRequest
 
-yield SeleniumRequest(url=url, callback=self.parse_result)
+    def start_requests(self):
+        for url in start_urls:
+            yield SeleniumRequest(url=url, callback=self.parse_result)
 ```
 The request will be handled by selenium, and the request will have an additional `meta` key, named `driver` containing the selenium driver with the request processed.
 ```python
-def parse_result(self, response):
-    print(response.request.meta['driver'].title)
+    def parse_result(self, response):
+        print(response.request.meta['driver'].title)
 ```
 For more information about the available driver methods and attributes, refer to the [selenium python documentation](http://selenium-python.readthedocs.io/api.html#module-selenium.webdriver.remote.webdriver)
 
@@ -105,7 +103,7 @@ def parse_result(self, response):
 ```
 
 #### `script`
-When used, selenium will execute custom JavaScript code.
+When used, selenium will execute custom JavaScript code after page loaded.
 ```python
 yield SeleniumRequest(
     url=url,
