@@ -105,6 +105,25 @@ class SeleniumMiddleware:
 
         return middleware
 
+    @staticmethod
+    def scroll_down_until_no_more_content(driver, timeout=10):
+        last_height = driver.execute_script("return document.body.scrollHeight")
+
+        while True:
+            driver.execute_script("window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });")
+
+            try:
+                WebDriverWait(driver, timeout).until(
+                    lambda d: d.execute_script("return document.body.scrollHeight") > last_height
+                )
+            except TimeoutException:
+                break
+
+            new_height = driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
     def process_request(self, request, spider):
         """Process a request using the selenium driver if applicable"""
 
@@ -142,6 +161,9 @@ class SeleniumMiddleware:
                 self.driver.execute_script(request.script)
             except Exception as e:
                 logging.error(f"JavaScript execution error: {e}")
+
+        if request.scroll_bottom:
+            SeleniumMiddleware.scroll_down_until_no_more_content(self.driver)
 
         body = str.encode(self.driver.page_source)
 

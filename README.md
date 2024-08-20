@@ -111,3 +111,13 @@ yield SeleniumRequest(
     script='window.scrollTo(0, document.body.scrollHeight);',
 )
 ```
+
+### `scroll_bottom`
+When used, selenium will scroll to bottom.
+```python
+yield SeleniumRequest(
+    url=url,
+    callback=self.parse_result,
+    scroll_bottom=True
+)
+```
