@@ -124,11 +124,32 @@ class SeleniumMiddleware:
                 break
             last_height = new_height
 
+    def _restart_driver(self):
+        old_driver = self.driver
+        driver_options = self.driver.options
+
+        # locally installed driver
+        if self.driver.service:
+            service = self.driver.service
+            driver_kwargs = {
+                'service': service,
+                'options': driver_options
+            }
+            self.driver = self.driver.__class__(**driver_kwargs)
+        # remote driver
+        elif self.driver.command_executor:
+            self.driver = webdriver.Remote(command_executor=self.driver.command_executor._url,
+                                        options=driver_options)
+        old_driver.quit()
+
     def process_request(self, request, spider):
         """Process a request using the selenium driver if applicable"""
 
         if not isinstance(request, SeleniumRequest):
             return None
+
+        if request.always_restart:
+            self._restart_driver()
 
         self.driver.get(request.url)
 
