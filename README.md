@@ -7,7 +7,7 @@ Scrapy middleware to handle javascript pages using selenium >= 4.0.0.
 ```
 $ pip install scrapy-selenium4
 ```
-You should use **python>=3.6**. 
+You should use **python>=3.6**.
 You will also need one of the Selenium [compatible browsers](http://www.seleniumhq.org/about/platforms.jsp).
 
 ## Configuration
@@ -33,8 +33,7 @@ SELENIUM_DRIVER_ARGUMENTS=[
     '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
 ]
 # In order to use a remote Selenium driver, specify SELENIUM_COMMAND_EXECUTOR instead of SELENIUM_DRIVER_EXECUTABLE_PATH.
-# `SELENIUM_DRIVER_EXECUTABLE_PATH` must be commented.
-SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
+# SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
 ```
 ## Usage
 Use the `scrapy_selenium4.SeleniumRequest` instead of the scrapy built-in `Request` like below:
