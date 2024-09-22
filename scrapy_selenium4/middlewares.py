@@ -1,15 +1,15 @@
 """This module contains the ``SeleniumMiddleware`` scrapy middleware"""
 
-from importlib import import_module
 import logging
+from importlib import import_module
 from shutil import which
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
 from scrapy.http import HtmlResponse
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
 
 from .http import SeleniumRequest
 
@@ -77,13 +77,13 @@ class SeleniumMiddleware:
         browser_executable_path = crawler.settings.get('SELENIUM_BROWSER_EXECUTABLE_PATH')
         command_executor = crawler.settings.get('SELENIUM_COMMAND_EXECUTOR')
         driver_arguments = crawler.settings.get('SELENIUM_DRIVER_ARGUMENTS', [
-            '--headless=new',  # '--disable-gpu',
+            '--headless=new',
             '--no-sandbox',
             '--disable-gpu',
             '--window-size=1280,1696',
             '--disable-blink-features',
             '--disable-blink-features=AutomationControlled',
-            '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
+            '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         ])
 
         if driver_name is None:
