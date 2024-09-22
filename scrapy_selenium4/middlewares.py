@@ -2,7 +2,9 @@
 
 import logging
 from importlib import import_module
+from queue import Queue
 from shutil import which
+from threading import Lock
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured
@@ -18,8 +20,8 @@ class SeleniumMiddleware:
     """Scrapy middleware handling the requests using selenium"""
 
     def __init__(self, driver_name, driver_executable_path,
-        browser_executable_path, command_executor, driver_arguments):
-        """Initialize the selenium webdriver
+                 browser_executable_path, command_executor, driver_arguments, driver_count):
+        """Initialize the selenium webdriver pool
 
         Parameters
         ----------
@@ -33,7 +35,21 @@ class SeleniumMiddleware:
             The path of the executable binary of the browser
         command_executor: str
             Selenium remote server endpoint
+        driver_count: int
+            Number of WebDriver instances to initialize
         """
+
+        self.driver_queue = Queue(maxsize=driver_count)
+        self.lock = Lock()
+
+        for _ in range(driver_count):
+            driver = self._create_driver(driver_name, driver_executable_path,
+                                         browser_executable_path, command_executor, driver_arguments)
+            self.driver_queue.put(driver)
+
+    def _create_driver(self, driver_name, driver_executable_path,
+                       browser_executable_path, command_executor, driver_arguments):
+        """Create a new selenium webdriver instance"""
 
         webdriver_base_path = f'selenium.webdriver.{driver_name}'
 
@@ -52,8 +68,8 @@ class SeleniumMiddleware:
 
         # remote driver
         if command_executor is not None:
-            self.driver = webdriver.Remote(command_executor=command_executor,
-                                           options=driver_options)
+            driver = webdriver.Remote(command_executor=command_executor,
+                                      options=driver_options)
         # locally installed driver
         elif driver_executable_path is not None:
             service_module = import_module(f'{webdriver_base_path}.service')
@@ -66,7 +82,9 @@ class SeleniumMiddleware:
                 'service': service,
                 'options': driver_options
             }
-            self.driver = driver_klass(**driver_kwargs)
+            driver = driver_klass(**driver_kwargs)
+
+        return driver
 
     @classmethod
     def from_crawler(cls, crawler):
@@ -85,6 +103,7 @@ class SeleniumMiddleware:
             '--disable-blink-features=AutomationControlled',
             '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         ])
+        driver_count = crawler.settings.get('SELENIUM_DRIVER_COUNT', 1)
 
         if driver_name is None:
             raise NotConfigured('SELENIUM_DRIVER_NAME must be set')
@@ -98,7 +117,8 @@ class SeleniumMiddleware:
             driver_executable_path=driver_executable_path,
             browser_executable_path=browser_executable_path,
             command_executor=command_executor,
-            driver_arguments=driver_arguments
+            driver_arguments=driver_arguments,
+            driver_count=driver_count
         )
 
         crawler.signals.connect(middleware.spider_closed, signals.spider_closed)
@@ -124,23 +144,24 @@ class SeleniumMiddleware:
                 break
             last_height = new_height
 
-    def _restart_driver(self):
-        old_driver = self.driver
-        driver_options = self.driver.options
+    def _restart_driver(self, driver):
+        old_driver = driver
+        driver_options = driver.options
 
         # locally installed driver
-        if self.driver.service:
-            service = self.driver.service
+        if driver.service:
+            service = driver.service
             driver_kwargs = {
                 'service': service,
                 'options': driver_options
             }
-            self.driver = self.driver.__class__(**driver_kwargs)
+            new_driver = driver.__class__(**driver_kwargs)
         # remote driver
-        elif self.driver.command_executor:
-            self.driver = webdriver.Remote(command_executor=self.driver.command_executor._url,
-                                        options=driver_options)
+        elif driver.command_executor:
+            new_driver = webdriver.Remote(command_executor=driver.command_executor._url,
+                                          options=driver_options)
         old_driver.quit()
+        return new_driver
 
     def process_request(self, request, spider):
         """Process a request using the selenium driver if applicable"""
@@ -148,13 +169,16 @@ class SeleniumMiddleware:
         if not isinstance(request, SeleniumRequest):
             return None
 
-        if request.always_restart:
-            self._restart_driver()
+        with self.lock:
+            driver = self.driver_queue.get()
 
-        self.driver.get(request.url)
+        if request.always_restart:
+            driver = self._restart_driver(driver)
+
+        driver.get(request.url)
 
         for cookie_name, cookie_value in request.cookies.items():
-            self.driver.add_cookie(
+            driver.add_cookie(
                 {
                     'name': cookie_name,
                     'value': cookie_value
@@ -163,43 +187,50 @@ class SeleniumMiddleware:
 
         if request.wait_until:
             try:
-                WebDriverWait(self.driver, request.wait_time).until(
+                WebDriverWait(driver, request.wait_time).until(
                     request.wait_until
                 )
             except TimeoutException:
                 pass
 
         if isinstance(request.screenshot, bool) and request.screenshot:
-            request.meta['screenshot'] = self.driver.get_screenshot_as_png()
+            request.meta['screenshot'] = driver.get_screenshot_as_png()
         elif isinstance(request.screenshot, str):
-            screenshot_data = self.driver.get_screenshot_as_png()
+            screenshot_data = driver.get_screenshot_as_png()
             with open(request.screenshot, 'wb') as f:
                 f.write(screenshot_data)
             request.meta['screenshot'] = request.screenshot
 
         if request.script:
             try:
-                self.driver.execute_script(request.script)
+                driver.execute_script(request.script)
             except Exception as e:
                 logging.error(f"JavaScript execution error: {e}")
 
         if request.scroll_bottom:
-            SeleniumMiddleware.scroll_down_until_no_more_content(self.driver)
+            SeleniumMiddleware.scroll_down_until_no_more_content(driver)
 
-        body = str.encode(self.driver.page_source)
+        body = str.encode(driver.page_source)
 
         # Expose the driver via the "meta" attribute
-        request.meta.update({'driver': self.driver})
+        request.meta.update({'driver': driver})
 
-        return HtmlResponse(
-            self.driver.current_url,
+        response = HtmlResponse(
+            driver.current_url,
             body=body,
             encoding='utf-8',
             request=request
         )
 
-    def spider_closed(self):
-        """Shutdown the driver when spider is closed"""
+        with self.lock:
+            self.driver_queue.put(driver)
 
-        self.driver.quit()
+        return response
+
+    def spider_closed(self):
+        """Shutdown all drivers when spider is closed"""
+
+        while not self.driver_queue.empty():
+            driver = self.driver_queue.get()
+            driver.quit()
 

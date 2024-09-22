@@ -18,7 +18,7 @@ URL = 'https://github.com/zhouyangchao/scrapy-selenium'
 EMAIL = 'zhouyates@gmail.com'
 AUTHOR = 'zhouyangchao'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.0.1rc5'
+VERSION = '1.0.1rc6'
 
 # What packages are required for this module to be executed?
 REQUIRED = [

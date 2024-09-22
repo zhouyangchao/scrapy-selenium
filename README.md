@@ -34,6 +34,8 @@ SELENIUM_DRIVER_ARGUMENTS=[
 ]
 # In order to use a remote Selenium driver, specify SELENIUM_COMMAND_EXECUTOR instead of SELENIUM_DRIVER_EXECUTABLE_PATH.
 # SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
+# Number of drivers to keep in the pool, default is 1
+# SELENIUM_DRIVER_COUNT = 1
 ```
 ## Usage
 Use the `scrapy_selenium4.SeleniumRequest` instead of the scrapy built-in `Request` like below:
