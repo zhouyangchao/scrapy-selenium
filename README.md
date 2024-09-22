@@ -30,7 +30,7 @@ SELENIUM_DRIVER_ARGUMENTS=[
     '--window-size=1280,1696',
     '--disable-blink-features',
     '--disable-blink-features=AutomationControlled',
-    '--user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"',
+    '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
 ]
 # In order to use a remote Selenium driver, specify SELENIUM_COMMAND_EXECUTOR instead of SELENIUM_DRIVER_EXECUTABLE_PATH.
 # SELENIUM_COMMAND_EXECUTOR = 'http://localhost:4444/wd/hub'
